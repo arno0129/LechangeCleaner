@@ -7,6 +7,7 @@ rootProject.file('version.properties').withInputStream { versionProps.load(it) }
 def moduleVersionName = versionProps.getProperty('VERSION_NAME')
 def moduleVersionCode = versionProps.getProperty('VERSION_CODE').toInteger()
 def generatedXposedDir = file("$buildDir/generated/xposedResources")
+def generatedLegalAssetsDir = file("$buildDir/generated/legalAssets")
 
 def keystoreProps = new Properties()
 def keystoreFile = rootProject.file('keystore/lechangecleaner.keystore')
@@ -50,6 +51,7 @@ android {
 
     sourceSets {
         main.resources.srcDir generatedXposedDir
+        main.assets.srcDir generatedLegalAssetsDir
     }
 
     compileOptions {
@@ -66,8 +68,14 @@ android {
 }
 
 tasks.register('generateXposedMetadata') {
-    inputs.file(rootProject.file('version.properties'))
-    outputs.file(file("$generatedXposedDir/META-INF/xposed/module.prop"))
+    inputs.files(
+            rootProject.file('version.properties'),
+            rootProject.file('LICENSE'),
+            rootProject.file('NOTICE'))
+    outputs.files(
+            file("$generatedXposedDir/META-INF/xposed/module.prop"),
+            file("$generatedLegalAssetsDir/legal/LICENSE"),
+            file("$generatedLegalAssetsDir/legal/NOTICE"))
     doLast {
         def output = file("$generatedXposedDir/META-INF/xposed/module.prop")
         output.parentFile.mkdirs()
@@ -81,11 +89,19 @@ author=arno0129
 staticScope=true
 autoHotReload=true
 """, 'UTF-8')
+
+        def legalDir = file("$generatedLegalAssetsDir/legal")
+        legalDir.mkdirs()
+        file("$legalDir/LICENSE").bytes = rootProject.file('LICENSE').bytes
+        file("$legalDir/NOTICE").bytes = rootProject.file('NOTICE').bytes
     }
 }
 
 tasks.configureEach { task ->
-    if (task.name ==~ /process.*JavaRes/) {
+    if (task.name != 'generateXposedMetadata'
+            && (task.name ==~ /.*Release.*/
+            || task.name ==~ /process.*JavaRes/
+            || task.name ==~ /merge.*Assets/)) {
         task.dependsOn tasks.named('generateXposedMetadata')
     }
 }

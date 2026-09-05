@@ -1,3 +1,7 @@
+/*
+ * Copyright 2026 arno0129
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package io.github.arno0129.lechangecleaner;
 
 final class Prefs {

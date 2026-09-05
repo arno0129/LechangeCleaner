@@ -43,3 +43,8 @@
 ## 测试声明
 
 应用启动时会显示内部测试声明。请仅在你有权测试的设备和应用中使用，测试完成后在 24 小时内删除程序及相关安装包。
+
+## 版权
+
+Copyright 2026 arno0129。项目以 Apache License 2.0 发布，详情见
+[LICENSE](LICENSE) 与 [NOTICE](NOTICE)。

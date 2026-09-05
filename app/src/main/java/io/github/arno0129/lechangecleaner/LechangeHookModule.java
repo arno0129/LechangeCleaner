@@ -1,3 +1,7 @@
+/*
+ * Copyright 2026 arno0129
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package io.github.arno0129.lechangecleaner;
 
 import android.app.Activity;
@@ -20,7 +24,7 @@ import java.util.WeakHashMap;
 import io.github.libxposed.api.XposedModule;
 
 public class LechangeHookModule extends XposedModule {
-    private static final String TAG = "LechangeHookShell";
+    private static final String TAG = "LechangeCleaner";
     private static final String TARGET_PACKAGE = "com.mm.android.lc";
     private static final long[] SCAN_DELAYS = {0, 32, 150, 400, 900, 1800};
 
