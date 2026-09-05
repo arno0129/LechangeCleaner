@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <queries>
+        <package android:name="com.mm.android.lc" />
+    </queries>
+
+    <application
+        android:name=".LechangeApp"
+        android:allowBackup="false"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/LechangeCleanerTheme">
+
+        <provider
+            android:name="io.github.libxposed.service.XposedProvider"
+            android:authorities="io.github.arno0129.lechangecleaner.XposedService"
+            android:exported="true" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="de.robv.android.xposed.category.MODULE_SETTINGS" />
+            </intent-filter>
+        </activity>
+
+        <activity-alias
+            android:name=".LauncherAlias"
+            android:exported="true"
+            android:targetActivity=".SettingsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <meta-data
+            android:name="xposeddescription"
+            android:value="@string/xposed_description" />
+    </application>
+</manifest>

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">乐橙界面净化</string>
+    <string name="xposed_description">移除乐橙开屏、广告、推荐和指定导航入口，并同步回收布局空间。</string>
+</resources>

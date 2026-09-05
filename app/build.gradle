@@ -1,0 +1,96 @@
+plugins {
+    id 'com.android.application'
+}
+
+def versionProps = new Properties()
+rootProject.file('version.properties').withInputStream { versionProps.load(it) }
+def moduleVersionName = versionProps.getProperty('VERSION_NAME')
+def moduleVersionCode = versionProps.getProperty('VERSION_CODE').toInteger()
+def generatedXposedDir = file("$buildDir/generated/xposedResources")
+
+def keystoreProps = new Properties()
+def keystoreFile = rootProject.file('keystore/lechangecleaner.keystore')
+def signingPropsFile = rootProject.file('keystore/signing.properties')
+boolean hasSigning = keystoreFile.exists() && signingPropsFile.exists()
+if (hasSigning) {
+    signingPropsFile.withInputStream { keystoreProps.load(it) }
+}
+
+android {
+    namespace 'io.github.arno0129.lechangecleaner'
+    compileSdk 37
+
+    defaultConfig {
+        applicationId 'io.github.arno0129.lechangecleaner'
+        minSdk 26
+        targetSdk 35
+        versionCode moduleVersionCode
+        versionName moduleVersionName
+    }
+
+    signingConfigs {
+        release {
+            if (hasSigning) {
+                storeFile keystoreFile
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig hasSigning ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    sourceSets {
+        main.resources.srcDir generatedXposedDir
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    packaging {
+        resources {
+            merges += 'META-INF/xposed/*'
+            excludes += ['META-INF/*.version', 'META-INF/*.kotlin_module']
+        }
+    }
+}
+
+tasks.register('generateXposedMetadata') {
+    inputs.file(rootProject.file('version.properties'))
+    outputs.file(file("$generatedXposedDir/META-INF/xposed/module.prop"))
+    doLast {
+        def output = file("$generatedXposedDir/META-INF/xposed/module.prop")
+        output.parentFile.mkdirs()
+        output.setText("""name=乐橙界面净化
+description=移除乐橙开屏、广告、推荐和指定导航入口，并同步回收布局空间。
+minApiVersion=101
+targetApiVersion=102
+version=${moduleVersionName}
+versionCode=${moduleVersionCode}
+author=arno0129
+staticScope=true
+autoHotReload=true
+""", 'UTF-8')
+    }
+}
+
+tasks.configureEach { task ->
+    if (task.name ==~ /process.*JavaRes/) {
+        task.dependsOn tasks.named('generateXposedMetadata')
+    }
+}
+
+dependencies {
+    compileOnly 'io.github.libxposed:api:102.0.0'
+    implementation 'io.github.libxposed:service:102.0.0'
+}
